@@ -1,14 +1,16 @@
-import { Controller, Req, Res, Next, Get, Post, Patch, Delete, Body, UsePipes, Param, HttpException } from '@nestjs/common';
+import { Controller, Req, Res, Get, Post, Patch, Delete, Body, UsePipes, Param, HttpException, UseGuards } from '@nestjs/common';
 import { Request, Response } from "express";
 import { AdminService } from './admin.service';
 import { successResponse, errorResponse } from 'utils/response_handler';
 import { CreateAdmin, LoginAdmin, UpdateAdmin } from "./interfaces/admin.interface";
 import { CreateAdminValidation, UpdateAdminValidate, LoginAdminValidate } from "./pipes/admin_validation.pipe";
 import { IsObjectId } from "../../utils/objectId_validation_pipe";
+import { AuthGuard } from "./admin.guard";
+import { CreateAuthToken } from "../../utils/jwt_token_authentication";
 
 @Controller('api/v1/admin')
 export class AdminController {
-    constructor(private adminService: AdminService) { }
+    constructor(private adminService: AdminService, private createAuthToken: CreateAuthToken) { }
 
     @Post()
     @UsePipes(new CreateAdminValidation())
@@ -53,7 +55,11 @@ export class AdminController {
                 return errorResponse(res, 400, "Invalid password")
             }
 
-            return successResponse(res, 200, "Admin login successfully", {});
+            const token = await this.createAuthToken.createToken({ id: isExist._id.toString(), email: isExist.email })
+            isExist["token"] = token;
+            delete isExist?.password;
+
+            return successResponse(res, 200, "Admin login successfully", isExist);
         }
         catch (error) {
             throw new HttpException("Internal server error", 500)
@@ -61,6 +67,7 @@ export class AdminController {
     }
 
     @Get()
+    @UseGuards(AuthGuard)
     async getAdminLists(@Req() req: Request, @Res() res: Response) {
         try {
 
@@ -74,6 +81,7 @@ export class AdminController {
     }
 
     @Get("/:id")
+    @UseGuards(AuthGuard)
     async getAdminDetails(@Param("id", IsObjectId) id: string, @Req() req: Request, @Res() res: Response) {
         try {
 
@@ -92,6 +100,7 @@ export class AdminController {
     }
 
     @Patch("/:id")
+    @UseGuards(AuthGuard)
     async updateAdmin(@Body(new UpdateAdminValidate()) update: UpdateAdmin, @Param("id", IsObjectId) id: string, @Req() req: Request, @Res() res: Response) {
         try {
 
@@ -110,6 +119,7 @@ export class AdminController {
     }
 
     @Delete("/:id")
+    @UseGuards(AuthGuard)
     async deleteAdmin(@Param("id", IsObjectId) id: string, @Req() req: Request, @Res() res: Response) {
         try {
 

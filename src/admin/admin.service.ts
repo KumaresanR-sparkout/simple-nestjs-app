@@ -15,8 +15,7 @@ export class AdminService {
     }
 
     async isExistAdmin(email: string) {
-        const admin = await this.adminModel.findOne({ email })
-            .select("-password");
+        const admin = await this.adminModel.findOne({ email }).lean();
         return admin;
     }
 

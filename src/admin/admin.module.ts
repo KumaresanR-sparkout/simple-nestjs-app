@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { AdminSchema, Admin } from "./models/admin.schema";
+import { CreateAuthToken } from "../../utils/jwt_token_authentication";
 
 
 @Module({
@@ -14,6 +15,6 @@ import { AdminSchema, Admin } from "./models/admin.schema";
         )
     ],
     controllers: [AdminController],
-    providers: [AdminService]
+    providers: [AdminService, CreateAuthToken]
 })
 export class AdminModule { }

@@ -11,12 +11,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const status = exception.getStatus();
         const message = exception.getResponse()
 
+        let errorMessage!: string;
+
+        if (typeof message === "string") {
+            errorMessage = message
+        }
+
+        if (typeof message === "object" && typeof message !== null) {
+            errorMessage = message["message"] || "An unexpected error occur"
+        }
+
+
         console.log("The Http error Exception is called. ❌");
 
         const result = {
             status: false,
             status_code: status,
-            message: message,
+            message: errorMessage,
             timestamp: new Date().toISOString(),
             path: request.url
         }
