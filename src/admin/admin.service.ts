@@ -3,6 +3,7 @@ import { Admin } from "./models/admin.schema";
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAdmin, UpdateAdmin } from "./interfaces/admin.interface";
+import { Observable, from } from 'rxjs';
 
 @Injectable()
 export class AdminService {
@@ -19,11 +20,11 @@ export class AdminService {
         return admin;
     }
 
-    async getAdminLists() {
+    getAdminLists(): Observable<any> {
 
-        const admin = await this.adminModel.find({})
+        const admin = this.adminModel.find({})
             .select("-password").lean();
-        return admin;
+        return from(admin);
     }
 
     async getAdmin(id: string) {

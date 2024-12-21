@@ -68,12 +68,21 @@ export class AdminController {
 
     @Get()
     @UseGuards(AuthGuard)
-    async getAdminLists(@Req() req: Request, @Res() res: Response) {
+    getAdminLists(@Req() req: Request, @Res() res: Response) {
         try {
-
-            const adminLists = await this.adminService.getAdminLists()
-
-            return successResponse(res, 200, "Admin lists retrieved successfully", adminLists);
+            this.adminService.getAdminLists().subscribe(
+                {
+                    next(data) {
+                        return successResponse(res, 200, "Admin lists fetched successfully.", data);
+                    },
+                    error(error) {
+                        return errorResponse(res, 500, "Error in fetching data");
+                    },
+                    complete() {
+                        console.log("Admin lists getting job completed.")
+                    }
+                }
+            )
         }
         catch (error) {
             throw new HttpException("Internal server error", 500)
