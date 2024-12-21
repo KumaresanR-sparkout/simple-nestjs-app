@@ -72,13 +72,13 @@ export class AdminController {
         try {
             this.adminService.getAdminLists().subscribe(
                 {
-                    next(data) {
+                    next: (data) => {
                         return successResponse(res, 200, "Admin lists fetched successfully.", data);
                     },
-                    error(error) {
+                    error: (error) => {
                         return errorResponse(res, 500, "Error in fetching data");
                     },
-                    complete() {
+                    complete: () => {
                         console.log("Admin lists getting job completed.")
                     }
                 }
