@@ -17,8 +17,8 @@ export class Admin {
     @Prop({ trim: true })
     last_name: string
 
-    @Prop({required:true,trim:true})
-    password:string
+    @Prop({ required: true, trim: true })
+    password: string
 
     @Prop({ required: true, unique: true })
     email: string
@@ -28,6 +28,9 @@ export class Admin {
 
     @Prop({ required: true, trime: true })
     country_code: string
+
+    @Prop({ default: false })
+    is_deleted: false
 }
 
 

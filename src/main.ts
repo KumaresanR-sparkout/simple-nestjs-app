@@ -7,7 +7,9 @@ import { json, urlencoded } from "express";
 const PORT: number = <number>(process.env?.PORT ?? 3000);
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule,{
+    // logger:["error","warn"]
+  });
 
   //Enable cors option
   app.enableCors(

@@ -8,9 +8,23 @@ import { CreateAuthToken } from "../../utils/jwt_token_authentication";
 
 @Module({
     imports: [
-        MongooseModule.forFeature(
+        MongooseModule.forFeatureAsync(
             [
-                { name: Admin.name, schema: AdminSchema }
+                {
+                    name: Admin.name,
+                    useFactory: () => {
+                        const schema = AdminSchema;
+                        schema.pre("find", excludeDeletedRecord);
+                        schema.pre("findOne", excludeDeletedRecord);
+                        schema.pre("countDocuments", excludeDeletedRecord);
+                        schema.pre("distinct", excludeDeletedRecord);
+                        schema.pre("aggregate", function (next) {
+                            this.pipeline().unshift({ $match: { is_deletd: false } })
+                            next();
+                        });
+                        return schema;
+                    }
+                }
             ]
         )
     ],
@@ -18,3 +32,10 @@ import { CreateAuthToken } from "../../utils/jwt_token_authentication";
     providers: [AdminService, CreateAuthToken]
 })
 export class AdminModule { }
+
+
+
+function excludeDeletedRecord(next: any) {
+    this.where({ is_deleted: { $exists: true, $eq: false } });
+    next();
+}
